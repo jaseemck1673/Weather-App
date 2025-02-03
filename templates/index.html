@@ -61,6 +61,7 @@
 
 				</div>
 			</div>
+			
 			<div class="forecast-table">
 				<div class="container">
 					<div class="forecast-container">
@@ -69,17 +70,18 @@
 								<div class="day">Monday</div>
 								<div class="date">6 Oct</div>
 							</div> <!-- .forecast-header -->
+							{% if datas %}
 							<div class="forecast-content">
-								<div class="location">New York</div>
+								<div class="location">{{ datas['name'] }}</div>
 								<div class="degree">
-									<div class="num">23<sup>o</sup>C</div>
+									<div class="num">{{ datas['main']['temp'] }}<sup>o</sup>C</div>
 									<div class="forecast-icon">
 										<img src="static/static/images/icons/icon-1.svg" alt="" width=90>
 									</div>	
 								</div>
-								<span><img src="static/static/images/icon-umberella.png" alt="">20%</span>
-								<span><img src="static/static/images/icon-wind.png" alt="">18km/h</span>
-								<span><img src="static/static/images/icon-compass.png" alt="">East</span>
+								<span><img src="static/static/images/icon-umberella.png" alt="">{{ datas['main']['humidity'] }}%</span>
+								<span><img src="static/static/images/icon-wind.png" alt="">{{ datas['wind']['speed'] }} m/s</span>
+								<span><img src="static/static/images/icon-compass.png" alt="">{{ datas['weather'][0]['description'] }}</span>
 							</div>
 						</div>
 						<div class="forecast">
@@ -157,6 +159,9 @@
 					</div>
 				</div>
 			</div>
+			{% else %}
+        		<p>No data available</p>
+    		{% endif %}
 			<!--
 			<main class="main-content">
 				<div class="fullwidth-block">

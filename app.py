@@ -1,14 +1,20 @@
+from flask import Flask, render_template, request
 from datetime import datetime
 import requests
+import requests
+
 from api import API_Key
-from flask import Flask, render_template,redirect,url_for,flash
+
 
 app = Flask(__name__)
 
+
 def data():
-    city_name= 'New Delhi'
+    city_name = "New Delhi"  # Default city if no city is provided
+    if request.method == 'POST':  # Only try to get city name from form if it's a POST request
+        city_name = request.form.get('city')
     url = f'https://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={API_Key}&units=metric'
-    return url,city_name
+    return url, city_name
 
 
 
@@ -94,7 +100,7 @@ def weekly_forcast(weather_url):
                 })
     return forecast_list
 
-@app.route('/')
+@app.route('/',methods=['GET', 'POST'])
 def index():
     weather_url,city = data()
     forecast = daily_forecast(weather_url,city)
@@ -103,32 +109,105 @@ def index():
 
 
 
-
-
-# @app.route('/')
-# def index():
-#     response = requests.get(url)
-#     if response.status_code == 200:
-#         data = response.json()
-#         print(data)
-#         print('Weather is ', data['weather'][0]['description'])
-#         print('Current Temperature is ',data['main']['temp'])
-#         print('Current Temperature feels like ',data['main']['feels_like'])
-#         print('Current humidity is ',data['main']['humidity'])
-#         print('Current humidity is ',data['name'])
-#         return render_template('index.html',datas=data)
-
 if __name__ == '__main__':
     app.run(debug=True)
  
-# response = requests.get(url)
-# if response.status_code == 200:
+
+# from flask import Flask, render_template, request  # Import request from flask, not requests
+# from datetime import datetime
+# import requests  # This is the correct import for the requests library
+# from api import API_Key  # Make sure you have this file and the API key
+
+# app = Flask(__name__)
+
+# # Function to fetch the city name and URL for API request
+# def data():
+#     city_name = "New Delhi"  # Default city if no city is provided
+#     if request.method == 'POST':  # Only try to get city name from form if it's a POST request
+#         city_name = request.form.get('city')
+#     url = f'https://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={API_Key}&units=metric'
+#     return url, city_name
+
+# # Function to get the daily forecast for today
+# def daily_forecast(weather_url, city):
+#     response = requests.get(weather_url)
 #     data = response.json()
-#     print('Weather is ', data['weather'][0]['description'])
-#     print('Current Temperature is ',data['main']['temp'])
-#     print('Current Temperature feels like ',data['main']['feels_like'])
-#     print('Current humidity is ',data['main']['humidity'])
+    
+#     daily_forecast_data = {}
+    
+#     for item in data['list']:
+#         date = item['dt_txt'].split(' ')[0]
+#         temp = item['main']['temp']
+#         description = item['weather'][0]['description']
+#         humidity = item['main']['humidity']
+#         wind = item['wind']['speed']
+#         icon_code = item['weather'][0]['icon']
+#         icon_url = f"http://openweathermap.org/img/wn/{icon_code}@2x.png"
+        
+#         today = datetime.now()
+#         f_today = today.strftime('%Y-%m-%d')
+#         day = today.day
+#         month = today.strftime('%B')
+#         year = today.year
+#         weekday = today.strftime('%A')
+        
+#         if date not in daily_forecast_data:
+#             daily_forecast_data[date] = {
+#                 "temp": temp,
+#                 "description": description,
+#                 "humidity": humidity,
+#                 "wind": wind,
+#                 "place": city,
+#                 "day": day,
+#                 "month": month,
+#                 "year": year,
+#                 "weekday": weekday,
+#                 "icon_url": icon_url
+#             }
 
+#     today_forecast = {}
+#     for date, forecast in daily_forecast_data.items():
+#         if date == f_today:
+#             today_forecast = forecast
+#             break 
 
+#     return today_forecast
 
+# # Function to get the weekly forecast
+# def weekly_forcast(weather_url):
+#     response = requests.get(weather_url)
+#     data = response.json()
+    
+#     forecast_list = []
+    
+#     if response.status_code == 200:
+#         for forecast in data['list']:
+#             dt_txt = forecast['dt_txt']  
+#             dt_obj = datetime.strptime(dt_txt, "%Y-%m-%d %H:%M:%S")
+            
+#             if dt_obj.hour == 12:  # Get forecast for midday
+#                 day_name = dt_obj.strftime("%A")
+#                 temperature = forecast['main']['temp']
+#                 description = forecast['weather'][0]['description']
+#                 icon_code = forecast['weather'][0]['icon']
+#                 icon_url = f"http://openweathermap.org/img/wn/{icon_code}@2x.png"
 
+#                 forecast_list.append({
+#                     "day": day_name,
+#                     "temperature": temperature,
+#                     "description": description,
+#                     "icon_url": icon_url
+#                 })
+
+#     return forecast_list
+
+# # Route for the main page
+# @app.route('/', methods=['GET', 'POST'])
+# def index():
+#     weather_url, city = data()
+#     forecast = daily_forecast(weather_url, city)
+#     weekly_forecast = weekly_forcast(weather_url)
+#     return render_template('index.html', forecast=forecast, weekly_forcast=weekly_forecast)
+
+# if __name__ == '__main__':
+#     app.run(debug=True)
